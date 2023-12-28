@@ -64,4 +64,12 @@ async def get_food(food_name, FoodEnum):
         return {"message: 'you are healthy'"}
     else:
         return {"message: 'you are an unhealthy alcoholic!"}
+    
+@app.get("/check_prime")
+async def solver(number : int):
+    for i in range(2, number):
+        if number % i == 0:
+            return f'{number} is not Prime'
+    else:
+        return f'{number} is prime'
         
