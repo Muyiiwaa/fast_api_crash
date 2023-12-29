@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from enum import Enum
+from pydantic import BaseModel
 
 # instantiate the app
 
@@ -57,9 +58,9 @@ class FoodEnum(str, Enum):
     
 
 @app.get("/foods/{food_name}")
-async def get_food(food_name, FoodEnum):
+async def get_food(food_name: FoodEnum):
     if food_name == FoodEnum.swallow:
-        return {"message: 'You are heavy'"}
+        return {"message: 'You are heavy'"} 
     elif food_name == FoodEnum.vegies:
         return {"message: 'you are healthy'"}
     else:
@@ -73,3 +74,34 @@ async def solver(number : int):
     else:
         return f'{number} is prime'
         
+
+class Item(BaseModel):
+    name : str
+    description : str | None = None
+    price : float
+    tax : float | None = None
+    
+@app.post("/items")
+async def create_item(item: Item):
+    item_dict = item.dict()
+    if item.tax:
+        gross = item.price + item.tax
+        item_dict.update({"gross_price": gross})
+    
+    return item_dict
+
+@app.put("/items/{item_id}")
+async def create_item_with_put(item_id: int, item: Item, q: str | None = None):
+    result = {"item_id": item_id, **item.dict()}
+    if q:
+        result.update({'q': q})
+    return result
+
+  
+@app.get("/item")
+async def read_items(q: str | None = None):
+    results = {"items": [{"item": "tomi"}, {"item": "abeke"}]}
+    if q:
+        results.update({"q": q})
+    return results
+    
